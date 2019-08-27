@@ -1,16 +1,11 @@
 package com.mitocode.controller;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
-
 import java.net.URI;
 import java.util.List;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.HttpStatus;
@@ -26,69 +21,65 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.mitocode.exception.ModelNotFoundException;
-import com.mitocode.model.Paciente;
-import com.mitocode.service.IPacienteService;
+import com.mitocode.model.Examen;
+import com.mitocode.service.IExamenService;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @RestController
-@RequestMapping("/pacientes")
-public class PacienteController {
+@RequestMapping("/examenes")
+public class ExamenController {
 
 	@Autowired
-	private IPacienteService service;
+	private IExamenService service;
 	
 	@GetMapping	
-	public ResponseEntity<List<Paciente>> listar(){
-		List<Paciente> lista = service.listar();
-		return new ResponseEntity<List<Paciente>>(lista, HttpStatus.OK);
+	public ResponseEntity<List<Examen>> listar(){
+		List<Examen> lista = service.listar();
+		return new ResponseEntity<List<Examen>>(lista, HttpStatus.OK);
 	}
 	
 	@GetMapping("/{id}")
-	public ResponseEntity<Paciente> leerPorId(@PathVariable("id") Integer id) {
-		Paciente obj = service.leerPorId(id);
+	public ResponseEntity<Examen> leerPorId(@PathVariable("id") Integer id) {
+		Examen obj = service.leerPorId(id);
 		if(obj == null) {
 			throw new ModelNotFoundException("ID NO ENCONTRADO: " + id);
 		}
-		return new ResponseEntity<Paciente>(obj, HttpStatus.OK);
-	}
-	
-	@GetMapping("/pageable")
-	public ResponseEntity<Page<Paciente>> listarPageable(Pageable pageable) {
-		Page<Paciente> pacientes = service.listarPageable(pageable);
-		return new ResponseEntity<Page<Paciente>>(pacientes, HttpStatus.OK);
+		return new ResponseEntity<Examen>(obj, HttpStatus.OK);
 	}
 		
 	@GetMapping("/hateoas/{id}")
-	public Resource<Paciente> leerPorIdHateoas(@PathVariable("id") Integer id) {
-		Paciente obj = service.leerPorId(id);
+	public Resource<Examen> leerPorIdHateoas(@PathVariable("id") Integer id) {
+		Examen obj = service.leerPorId(id);
 		if(obj == null) {
 			throw new ModelNotFoundException("ID NO ENCONTRADO: " + id);
 		}
 		
-		Resource<Paciente> resource = new Resource<Paciente>(obj);
+		Resource<Examen> resource = new Resource<Examen>(obj);
 		// localhost:8080/pacientes/{id}
 		ControllerLinkBuilder linkTo = linkTo(methodOn(this.getClass()).leerPorId(id));
-		resource.add(linkTo.withRel("paciente-resource"));
+		resource.add(linkTo.withRel("examen-resource"));
 		return resource;
 		
 	}
 	
 	@PostMapping
-	public ResponseEntity<Object> registrar(@Valid @RequestBody Paciente pac) {
-		Paciente paciente = service.registrar(pac);
+	public ResponseEntity<Object> registrar(@Valid @RequestBody Examen pac) {
+		Examen paciente = service.registrar(pac);
 		// localhost:8080/pacientes/1
-		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(paciente.getIdPaciente()).toUri();
+		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(paciente.getIdExamen()).toUri();
 		return ResponseEntity.created(location).build();
 	}
 	
 	@PutMapping
-	public ResponseEntity<Object>  modificar(@Valid @RequestBody Paciente pac) {
+	public ResponseEntity<Object>  modificar(@Valid @RequestBody Examen pac) {
 		service.modificar(pac);
 		return new ResponseEntity<Object>(HttpStatus.OK);
 	}
 	
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Object>  eliminar(@PathVariable("id") Integer id) {
-		Paciente obj = service.leerPorId(id);
+		Examen obj = service.leerPorId(id);
 		if(obj == null) {
 			throw new ModelNotFoundException("ID NO ENCONTRADO: " + id);
 		}else {
